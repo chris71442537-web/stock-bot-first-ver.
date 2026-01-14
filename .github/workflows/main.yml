@@ -1,0 +1,31 @@
+name: Daily Stock Scanner
+
+on:
+  schedule:
+    # UTC 기준 23시 30분 = 한국 시간(KST) 오전 8시 30분
+    - cron: '30 23 * * *'
+  workflow_dispatch: # 수동으로도 실행할 수 있게 하는 버튼
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 가져오기
+        uses: actions/checkout@v3
+
+      - name: 파이썬 설치
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: 라이브러리 설치
+        run: |
+          pip install pandas yfinance finance-datareader requests
+
+      - name: 스캐너 실행
+        env:
+          # 4단계에서 설정할 금고 열쇠를 연결
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: python main.py
